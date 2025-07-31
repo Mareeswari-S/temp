@@ -1,14 +1,18 @@
 FROM node:18
 
-
 # Create app directory
 WORKDIR /usr/src/app
 
-# Copy package files and install dependencies
+# Copy package files
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
 
-# Copy source files
+# Install build tools and dependencies
+RUN apt-get update && apt-get install -y python3 make g++ \
+  && npm install --legacy-peer-deps \
+  && apt-get remove --purge -y python3 make g++ \
+  && apt-get autoremove -y
+
+# Copy rest of the source files
 COPY . .
 
 # Set environment variables
@@ -20,3 +24,4 @@ EXPOSE 5678
 
 # Start n8n
 CMD ["npm", "run", "start"]
+
